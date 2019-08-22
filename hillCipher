@@ -1,0 +1,64 @@
+import numpy as np
+from sympy import Matrix
+
+plainToNum = {'A' : 0, 'B' : 1, 'C' : 2, 'D' : 3, 'E' : 4, 'F' : 5, 'G' : 6, 'H' : 7, 'I' : 8, 'J' : 9, 'K' : 10, 'L' : 11,
+              'M' : 12, 'N' : 13, 'O' : 14, 'P' : 15, 'Q' : 16, 'R' : 17, 'S' : 18, 'T' : 19, 'U' : 20, 'V' : 21, 'W' : 22,
+              'X' : 23, 'Y' : 24, 'Z' : 25, ',' : 26, '.' : 27, '?' : 28, '!' : 29, ' ' : 30,}
+
+
+def tranferToArray(string):
+    return list(string)
+
+def mapFromPlainToNum(key):
+    return plainToNum.get(key)
+
+def mapFromNumToPlain(value):
+    for itemKey, itemValue in plainToNum.items():
+        if value == itemValue:
+            return itemKey
+
+def tranferToMatrix(string):
+    temp = tranferToArray(string)
+    arr=[-1,-1,-1,-1]
+    for i in range(len(string)):
+        arr[i] = mapFromPlainToNum(temp[i])
+    return np.array(arr)
+
+def findKey(givenPlainMatrix, givenCipherMatrix):
+    keyMatrix = (((Matrix(givenPlainMatrix).inv_mod(31)).tolist())* givenCipherMatrix)%31
+    return keyMatrix
+
+
+def descryption(ciphertext, keyMatrix):
+    inverseKey = (Matrix(keyMatrix).inv_mod(31)).tolist()
+    print  inverseKey
+    step = 4
+    temp1 = []
+    plain = []
+    plaintext = []
+    ciphertextArray = [list(ciphertext)[i:i + step] for i in range(0, len(list(ciphertext)), step)]
+    for item in ciphertextArray:
+        arr = item
+        for i in range(4):
+            temp1.append(mapFromPlainToNum(arr[i]))
+    numArray = [list(temp1)[i:i + step] for i in range(0, len(list(temp1)), step)]
+    for var in numArray:
+        plain.append(np.matrix(var)* (inverseKey)%31)
+    for thing in plain:
+        z = np.matrix.tolist(thing)[0]
+        for j in range(len(z)):
+            plaintext.append(mapFromNumToPlain(z[j]))
+    return "".join(plaintext)
+
+
+if __name__ == '__main__':
+    givenPlainMatrix = np.matrix(
+        [tranferToMatrix("CTRL"),tranferToMatrix("CAPS"),tranferToMatrix("HOME"),tranferToMatrix("PGUP")])
+    givenCipherMatrix = np.matrix(
+        [tranferToMatrix("HGPP"), tranferToMatrix("HOFL"), tranferToMatrix("TTSI"), tranferToMatrix("DACR")])
+    ciphertext = "!LPUMYAIJ?.MPA.DVRFUTNRUZYEFM?QVKJTOBTDRIAN!?SLQBKESZOSFRAAWYPI.VBOLLMWAWEMQ.JYBOITGNJRIFYGEGIBC?RB?UN?MORI,"
+    keyMatrix = findKey(givenPlainMatrix, givenCipherMatrix)
+    print descryption(ciphertext, keyMatrix)
+    # print(givenPlainMatrix)
+    # print (givenCipherMatrix)
+    # print findKey(givenPlainMatrix, givenCipherMatrix)
