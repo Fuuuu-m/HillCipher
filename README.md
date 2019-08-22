@@ -1,3 +1,4 @@
+
 This code is to find the key(K) and then descript the given ciphertext. 
 
 Correspondence between plaintext and number modulo 31 are as follows:
